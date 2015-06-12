@@ -21,8 +21,8 @@ type AdAPI struct {
 	s Store
 }
 type AdAPIRequest struct {
-	ChannelName string
-	Air         *Air
+	ChannelName string `json:"name"`
+	Air         *Air   `json:"air"`
 }
 
 func NewAdAPI(s Store) *AdAPI {
@@ -41,7 +41,7 @@ func (api *AdAPI) Get(w http.ResponseWriter, r *http.Request) {
 		directive := r.URL.Query().Get("dir")
 		c, err := api.s.Get(channelName)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusNotFound)
 			encoder.Encode(&jsonError{err.Error()})
 			return
 		}
@@ -69,6 +69,9 @@ func (api *AdAPI) Get(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			encoder.Encode("nothing to show")
+			return
+		default:
+			encoder.Encode(ch)
 			return
 		}
 
