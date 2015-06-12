@@ -81,6 +81,13 @@ func (m *MemoryStore) Get(key interface{}) (interface{}, error) {
 	return nil, errors.New("key not found")
 }
 
+func NewShowTime(start time.Time, duration time.Duration) *ShowTime {
+	p, err := period.CreateFromDuration(start, duration)
+	if err != nil {
+		// TODO: Log this?
+	}
+	return &ShowTime{Period: p}
+}
 func (s *ShowTime) Add(a *Air) error {
 	sort.Sort(s.Airs)
 	if s.Period.Contains(a.Period.Start) {
@@ -103,6 +110,19 @@ func (s *ShowTime) Add(a *Air) error {
 	return errors.New("airtime out of range")
 }
 
+// Show returns what is in the air right now.
+func (s *ShowTime) Show() *Air {
+	return s.showAt(time.Now())
+}
+func (s *ShowTime) showAt(t time.Time) *Air {
+	for _, v := range s.Airs {
+		if v.Period.Contains(t) {
+			return v
+		}
+	}
+	return nil
+}
+
 func NewAir(start time.Time, duration time.Duration, Data interface{}) *Air {
 	p, err := period.CreateFromDuration(start, duration)
 	if err != nil {
@@ -121,14 +141,8 @@ func CreateDaySchedule(c *Channel) *Channel {
 	start := begin
 	interval := time.Hour
 	for _ = range make([]struct{}, 24) {
-		p, err := period.CreateFromDuration(start, interval)
-		if err != nil {
-			// TODO: Log this?
-		}
-		s := &ShowTime{
-			Period: p,
-		}
-		start = p.End
+		s := NewShowTime(start, interval)
+		start = s.Period.End
 		c.AddShow(s)
 	}
 	sort.Sort(c.Shows)
