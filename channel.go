@@ -25,6 +25,18 @@ func (s Shows) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (c *Channel) AddShow(s *ShowTime) {
 	c.Shows = append(c.Shows, s)
 }
+func (c *Channel) Show() *ShowTime {
+	return c.showAt(time.Now())
+}
+
+func (c *Channel) showAt(t time.Time) *ShowTime {
+	for _, v := range c.Shows {
+		if v.Period.Contains(t) {
+			return v
+		}
+	}
+	return nil
+}
 
 func CreateDaySchedule(c *Channel) *Channel {
 	begin := now.BeginningOfDay()
