@@ -9,7 +9,7 @@ func TestMemoryStore_Set(t *testing.T) {
 		{"adapi", "a personal ad server"},
 		{"gernest", "Learning the hard way"},
 	}
-	m := NewMemSTore()
+	m := NewMemStore()
 	for _, v := range result {
 		err := m.Set(v.key, v.value)
 		if err != nil {
@@ -29,7 +29,7 @@ func TestMemoryStore_Get(t *testing.T) {
 		{"adapi", "a personal ad server"},
 		{"gernest", "Learning the hard way"},
 	}
-	m := NewMemSTore()
+	m := NewMemStore()
 	for _, v := range result {
 		err := m.Set(v.key, v.value)
 		if err != nil {

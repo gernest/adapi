@@ -1,3 +1,6 @@
+/*
+Package adapi is a personal advertisment management API service.
+*/
 package adapi
 
 import (
@@ -11,20 +14,24 @@ import (
 )
 
 var (
-	ErrChanOffline = errors.New("sorry the channel is offline")
+	errChanOffline = errors.New("sorry the channel is offline")
 	contentType    = "Content-Type"
-	contentJson    = "application/json"
+	contentJSON    = "application/json"
 	charset        = "charset=utf-8"
 )
 
+// AdAPI is the main type with the core handlers
 type AdAPI struct {
 	s Store
 }
-type AdAPIRequest struct {
+
+// Request is the request object, used in posting new airtime data.
+type Request struct {
 	ChannelName string `json:"name"`
 	Air         *Air   `json:"air"`
 }
 
+// NewAdAPI creates a new AdAPI object
 func NewAdAPI(s Store) *AdAPI {
 	return &AdAPI{s}
 }
@@ -33,9 +40,21 @@ type jsonError struct {
 	Error string `json:"error"`
 }
 
+// Get retrieves data from the AdAPI server. This method relies on url queries to understand
+// the request. To avoid long names, "chn" is used to represent the channel name, and "dir" is used
+// to represent directive.
+//
+// Directives are strings, which have different meaning in the method. The following are the base directives.
+//    schedule : represent a 24 hour schedule with 24 showtimes. Each showtime takes a duration of one hour.
+//               this  is the value contained in the Shows property of a channel.
+//    show     : represent the current show, it is a showtime in the channel whose period contains time.Now()
+//    air      : whats on air right now, it is the airtime whose period contains time.Now()
+//
+// So, if you want to get what is currently on air in adapi channel, you can write a query like
+//   ?chn=adapi&dir=air
 func (api *AdAPI) Get(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
-	w.Header().Set(contentType, fmt.Sprintf("%s;%s", contentJson, charset))
+	w.Header().Set(contentType, fmt.Sprintf("%s;%s", contentJSON, charset))
 	if r.Method == "GET" {
 		channelName := r.URL.Query().Get("chn")
 		directive := r.URL.Query().Get("dir")
@@ -77,15 +96,17 @@ func (api *AdAPI) Get(w http.ResponseWriter, r *http.Request) {
 
 	}
 	w.WriteHeader(http.StatusNotFound)
-	encoder.Encode(&jsonError{ErrChanOffline.Error()})
+	encoder.Encode(&jsonError{errChanOffline.Error()})
 	return
 }
 
+// Post adds an Air to the channel, the request body should be of type Request
+// if the channel is not found, a new channel is created.
 func (api *AdAPI) Post(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
-	w.Header().Set(contentType, fmt.Sprintf("%s;%s", contentJson, charset))
+	w.Header().Set(contentType, fmt.Sprintf("%s;%s", contentJSON, charset))
 	if r.Method == "POST" {
-		req := &AdAPIRequest{}
+		req := &Request{}
 		buf := &bytes.Buffer{}
 		io.Copy(buf, r.Body)
 		err := json.Unmarshal(buf.Bytes(), req)
@@ -106,11 +127,11 @@ func (api *AdAPI) Post(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (api *AdAPI) postToChannel(req *AdAPIRequest) (*Channel, error) {
+func (api *AdAPI) postToChannel(req *Request) (*Channel, error) {
 	return postAChannel(api.s, req)
 }
 
-func postAChannel(s Store, req *AdAPIRequest) (*Channel, error) {
+func postAChannel(s Store, req *Request) (*Channel, error) {
 	c, _ := s.Get(req.ChannelName)
 	if c != nil {
 		ch := c.(*Channel)

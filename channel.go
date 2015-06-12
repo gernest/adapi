@@ -8,11 +8,13 @@ import (
 	"github.com/jinzhu/now"
 )
 
+// Channel is object containing shows( or a schedule of shows)
 type Channel struct {
-	Name  string
-	Shows Shows
+	Name  string `json:"name"`
+	Shows Shows  `json:"shows"`
 }
 
+// Shows is a sortable slice of showtimes
 type Shows []*ShowTime
 
 func (s Shows) Len() int { return len(s) }
@@ -22,9 +24,12 @@ func (s Shows) Less(i, j int) bool {
 }
 func (s Shows) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 
+// AddShow adds a showtime to a channel
 func (c *Channel) AddShow(s *ShowTime) {
 	c.Shows = append(c.Shows, s)
 }
+
+// Show returns the current showtime
 func (c *Channel) Show() *ShowTime {
 	return c.showAt(time.Now())
 }
@@ -38,6 +43,7 @@ func (c *Channel) showAt(t time.Time) *ShowTime {
 	return nil
 }
 
+// CreateDaySchedule creates a slice of showtimes within a 24 hours range
 func CreateDaySchedule(c *Channel) *Channel {
 	begin := now.BeginningOfDay()
 	start := begin
@@ -51,6 +57,7 @@ func CreateDaySchedule(c *Channel) *Channel {
 	return c
 }
 
+// AddAirTime ads an air time to the channel
 func AddAirTime(c *Channel, air *Air) error {
 	for _, v := range c.Shows {
 		if v.Period.Contains(air.Period.Start) {

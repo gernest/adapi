@@ -2,19 +2,23 @@ package adapi
 
 import "errors"
 
+// Store is an interface which when implemented acts as storage backend
 type Store interface {
 	Set(key interface{}, value interface{}) error
 	Get(key interface{}) (interface{}, error)
 }
 
+// MemoryStore is a simple in memory implementation of Store. It uses a map.
 type MemoryStore struct {
 	d map[string]interface{}
 }
 
-func NewMemSTore() *MemoryStore {
+// NewMemStore initializes a new memoryStore
+func NewMemStore() *MemoryStore {
 	return &MemoryStore{make(map[string]interface{})}
 }
 
+// Set saves the value with the given key
 func (m *MemoryStore) Set(key interface{}, value interface{}) error {
 	var k string
 	switch key.(type) {
@@ -27,6 +31,7 @@ func (m *MemoryStore) Set(key interface{}, value interface{}) error {
 	return nil
 }
 
+// Get retrieves a value with the given key.
 func (m *MemoryStore) Get(key interface{}) (interface{}, error) {
 	var k string
 	switch key.(type) {
