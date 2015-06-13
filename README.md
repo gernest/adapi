@@ -1,4 +1,4 @@
-# adapi
+# adapi [![Build Status](https://drone.io/github.com/gernest/adapi/status.png)](https://drone.io/github.com/gernest/adapi/latest)
 Personal advertisment management API service.
 
 ## Warning
