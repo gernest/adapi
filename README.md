@@ -1,4 +1,4 @@
-# adapi [![Build Status](https://drone.io/github.com/gernest/adapi/status.png)](https://drone.io/github.com/gernest/adapi/latest)[![GoDoc](https://godoc.org/github.com/gernest/adapi?status.svg)](https://godoc.org/github.com/gernest/adapi)
+# adapi [![Build Status](https://drone.io/github.com/gernest/adapi/status.png)](https://drone.io/github.com/gernest/adapi/latest)[![GoDoc](https://godoc.org/github.com/gernest/adapi?status.svg)](https://godoc.org/github.com/gernest/adapi)[![Coverage Status](https://coveralls.io/repos/gernest/adapi/badge.svg?branch=master&service=github)](https://coveralls.io/github/gernest/adapi?branch=master)
 Personal advertisment management API service.
 
 ## Warning
